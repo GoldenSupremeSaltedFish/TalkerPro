@@ -1,8 +1,9 @@
 package org.example.talker.StartSpark;
 
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.redisson.api.RedissonClient;
 /**
  * @author HumphreyLi
  * @version 1.0
@@ -12,5 +13,20 @@ import org.springframework.beans.factory.annotation.Value;
  * @time 上午12:46
  */
 public class SparkApiTalkService {
+   private String url;
+   //用redis获取url;
+   @Resource
+   private RedissonClient redissonClient;
+
+   public String SparkApiTalkService(String message) throws Exception{
+        url=redissonClient.getBucket("url").get().toString();//从redis中获取url
+
+        //调用api，
+       //在此处消费消息
+
+        return  url;
+
+
+   }
 
 }

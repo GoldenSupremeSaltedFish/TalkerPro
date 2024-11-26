@@ -15,4 +15,13 @@ public interface Kafka {
     String sendToDelayedQueue(KafkaMessage message);
 
     KafkaMessage getDelayedMessage(String topic);
+
+    String SendToSparkNormal(KafkaMessage message);
+
+    String SendToSparkVip(KafkaMessage message);
+
+    KafkaMessage getSparkVip(String topic);
+
+    KafkaMessage getSparkNormal(String topic);
+
 }

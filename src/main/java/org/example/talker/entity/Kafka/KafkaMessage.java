@@ -25,6 +25,6 @@ public class KafkaMessage {
     private int recipient;     // 接收者
     private long timestamp;    // 消息时间戳
     private Map<String, String> metadata;
-    // 自定义构造函数，不包含时间戳（为了兼容性）
+
 
 }

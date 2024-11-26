@@ -30,43 +30,6 @@ public class talkerserviceimpl implements talkservice {
     private RedisTemplate<String, TalkMessage> redisTemplate;
     @Resource
     private MessageMapper messageMapper;
-    @Override
-    public String MessagetoRedis(TalkMessage talkMessage) {
-        if (!IsMessageRight(talkMessage)) {
-            log.error("Invalid message");
-            return "Invalid message";
-        }
-
-        try {
-            // 使用 messageid 作为 key
-            String key = "message:" + talkMessage.getMessageid();
-
-            // 将 TalkMessage 对象存储到 Redis
-            redisTemplate.opsForValue().set(key, talkMessage);
-
-            // 设置过期时间（可选，这里设置为24小时）
-            redisTemplate.expire(key, 24, TimeUnit.HOURS);
-
-            return "MessageMapper successfully stored in Redis";
-        } catch (Exception e) {
-            // 记录异常
-            e.printStackTrace();
-            return "Failed to store message in Redis: " + e.getMessage();
-        }
-    }
-
-    @Override
-    public TalkMessage MessagefromRedis(String key) {
-        // 从 Redis 中获取 TalkMessage 对象
-        TalkMessage talkMessage = redisTemplate.opsForValue().get(key);
-
-        // 如果对象不存在，返回 null
-        if (talkMessage == null) {
-            return null;
-        }
-
-        return talkMessage;
-    }
 
     @Override
     public String MessagetoMysql(TalkMessage talkMessage) {
@@ -105,7 +68,28 @@ public class talkerserviceimpl implements talkservice {
 
     @Override
     public String MessagetoKafka(TalkMessage talkMessage) {
-        return "";
+        if (!IsMessageRight(talkMessage)) {
+            log.error("Invalid message");
+            return "Invalid message";
+        }
+
+        try {
+            // 使用 messageid 作为 key
+            String key = "message:" + talkMessage.getMessageid();
+
+            // 将 TalkMessage 对象存储到 Redis
+            redisTemplate.opsForValue().set(key, talkMessage);
+
+            // 设置过期时间（可选，这里设置为24小时）
+            redisTemplate.expire(key, 24, TimeUnit.HOURS);
+
+            return "MessageMapper successfully stored in Redis";
+        } catch (Exception e) {
+            // 记录异常
+            e.printStackTrace();
+            return "Failed to store message in Redis: " + e.getMessage();
+        }
+
     }
 
     @Override

@@ -39,6 +39,11 @@ public class KafkaConfig {
     @Value("${kafka.consumer.group-id}")
     private String groupId;
 
+    @Value("${kafka.topics.SendToSparkNormal}")
+    private String sendToSparkNormalTopic;
+
+    @Value("${kafka.topics.SendToSparkVip}")
+    private String sendToSparkVipTopic;
 
     @Bean
     public NewTopic myTopic() {
@@ -59,6 +64,24 @@ public class KafkaConfig {
     @Bean
     public NewTopic deadLetterTopic() {
         return TopicBuilder.name(delayedMessagesTopic)
+                .partitions(1)
+                .replicas(2)
+                .build();
+    }
+
+    @Bean
+    public NewTopic SendToSparkNormal()
+    {
+        return TopicBuilder.name(sendToSparkNormalTopic)
+               .partitions(1)
+               .replicas(2)
+               .build();
+    }
+
+    @Bean
+    public NewTopic SendToSparkVip()
+    {
+        return TopicBuilder.name(sendToSparkVipTopic)
                 .partitions(1)
                 .replicas(2)
                 .build();

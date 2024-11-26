@@ -57,8 +57,7 @@ public class TalkerController {
         Map<String, Object> response = new HashMap<>();
         if(talkerservice.IsMessageRight(talkMessages))
         {
-            //todo
-            // 封装api请求（进行token调用）
+
 
             talkerservice.MessagetoKafka(talkMessages);
 
@@ -121,8 +120,6 @@ public class TalkerController {
                 }
             }
         }
-
-
         return null;
     }
 

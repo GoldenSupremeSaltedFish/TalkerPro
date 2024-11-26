@@ -4,9 +4,6 @@ import org.example.talker.entity.TalkMessage;
 
 
 public interface talkservice {
-    String MessagetoRedis(TalkMessage talkMessage);
-
-    TalkMessage MessagefromRedis(String messageid);
 
     String MessagetoMysql(TalkMessage talkMessage);
 
