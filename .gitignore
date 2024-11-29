@@ -1,0 +1,25 @@
+# 忽略 IDE 配置文件
+.idea/
+.vscode/
+target/
+logs/
+
+# 忽略操作系统产生的文件
+*.DS_Store
+Thumbs.db
+
+# 忽略日志文件
+*.log
+
+
+# 忽略 Java 的编译文件
+*.class
+*.jar
+*.war
+
+# 忽略 node_modules 目录
+node_modules/
+
+# 忽略构建目录
+dist/
+build/
