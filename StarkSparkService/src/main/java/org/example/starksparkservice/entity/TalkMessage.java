@@ -1,6 +1,7 @@
-package org.example.talker.entity;
+package org.example.starksparkservice.entity;
 
 import lombok.Getter;
+
 /**
  * 这个类用于存储消息。
  *

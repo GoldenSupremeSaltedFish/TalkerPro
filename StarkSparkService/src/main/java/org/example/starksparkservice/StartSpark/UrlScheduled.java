@@ -1,8 +1,11 @@
-package org.example.talker.StartSpark;
+package org.example.starksparkservice.StartSpark;
 
-import org.example.talker.util.Impl.StarSparkAuthUtils;
+
+import org.example.starksparkservice.config.StarSparkAuthUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,17 +22,22 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class UrlScheduled {
-
-    // 定义静态的 Logger 对象
     private static final Logger logger = LoggerFactory.getLogger(UrlScheduled.class);
 
-    @Scheduled(fixedRate = 20000) // 20秒执行一次
+    private final RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private StarSparkAuthUtils starSparkAuthUtils; // 使用@Autowired注解自动注入
+
+    public UrlScheduled(@Qualifier("redisTemplateString") RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Scheduled(fixedRate = 2000) // 每298秒执行一次
     public void scheduled() {
         try {
-            String url = StarSparkAuthUtils.generateAuthUrl();
-            // 存入redis，设置过期时间为25秒
-            RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-            redisTemplate.opsForValue().set("url", url, 25, TimeUnit.SECONDS);
+            String url = starSparkAuthUtils.generateAuthUrl();
+            redisTemplate.opsForValue().set("url1", url, 30000, TimeUnit.SECONDS);
         } catch (Exception e) {
             logger.error("生成url失败", e);
         }

@@ -23,8 +23,6 @@ import java.util.TimeZone;
  * @time 上午1:49
  */
 @Service
-
-
 public class StarSparkAuthUtils {
 
     // 将静态字段改为实例字段
@@ -40,7 +38,9 @@ public class StarSparkAuthUtils {
     private String PATH;
     @Value("${spring.spark.method}")
     private String METHOD;
+
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(StarSparkAuthUtils.class);
+
     /**
      * 生成讯飞星火认知大模型的认证 URL
      *
@@ -48,26 +48,31 @@ public class StarSparkAuthUtils {
      * @throws Exception 如果生成过程中发生错误
      */
     public String generateAuthUrl() throws Exception {
-        logger.info("开始生成认证 URL");
-        //打印所有的参数
-        logger.info("AppID: " + AppID);
-        logger.info("API_SECRET: " + API_SECRET);
-        logger.info("API_KEY: " + API_KEY);
-        logger.info("HOST: " + HOST);
-        logger.info("PATH: " + PATH);
-        logger.info("METHOD: " + METHOD);
-        // 生成 date 参数
+//        logger.info("开始生成认证 URL");
+
+        // 生成日期字符串
         String date = getFormattedDate();
-        // 生成 tmp 字符串
+
+        // 拼接 tmp 字符串（用于生成签名）
         String tmp = "host: " + HOST + "\n" + "date: " + date + "\n" + METHOD + " " + PATH + " HTTP/1.1";
-        // 使用 hmac-sha256 生成签名
+//        logger.debug("tmp: " + tmp); // 打印拼接的 tmp 字符串
+
+        // 生成签名
         String signature = generateSignature(tmp, API_SECRET);
-        // 生成 authorization_origin 字符串
+
+        // 拼接 authorization_origin 字符串
         String authorizationOrigin = String.format("api_key=\"%s\", algorithm=\"hmac-sha256\", headers=\"host date request-line\", signature=\"%s\"", API_KEY, signature);
-        // 将 authorization_origin 进行 base64 编码
+//        logger.debug("authorization_origin: " + authorizationOrigin); // 打印 authorization_origin
+
+        // 对 authorization_origin 进行 Base64 编码
         String authorization = Base64.getEncoder().encodeToString(authorizationOrigin.getBytes(StandardCharsets.UTF_8));
-        // 构建最终的 URL
-        return String.format("wss://%s%s?authorization=%s&date=%s&host=%s", HOST, PATH, URLEncoder.encode(authorization, StandardCharsets.UTF_8.toString()), URLEncoder.encode(date, StandardCharsets.UTF_8.toString()), URLEncoder.encode(HOST, StandardCharsets.UTF_8.toString()));
+//        logger.debug("authorization (Base64): " + authorization); // 打印编码后的 authorization
+
+        // 构建最终的认证 URL
+        return String.format("%s?authorization=%s&date=%s&host=%s", HOST,
+                URLEncoder.encode(authorization, StandardCharsets.UTF_8.toString()),
+                URLEncoder.encode(date, StandardCharsets.UTF_8.toString()),
+                URLEncoder.encode(HOST, StandardCharsets.UTF_8.toString()));
     }
 
     /**

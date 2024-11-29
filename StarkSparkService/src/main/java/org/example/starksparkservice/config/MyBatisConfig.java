@@ -1,15 +1,7 @@
-package org.example.talker.config;
+package org.example.starksparkservice.config;
 
-import jakarta.annotation.PostConstruct;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
-import javax.sql.DataSource;
 
 /**
  *   这个类是mybatis的配置类，用于配置mybatis的连接信息，包括连接地址、用户名、密码等。
@@ -21,7 +13,7 @@ import javax.sql.DataSource;
  */
 
 @Configuration
-@MapperScan("org.example.talker.mapper")
+@MapperScan("org.example.starksparkservice.mapper")
 public class MyBatisConfig {
 
 //    @Bean public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception

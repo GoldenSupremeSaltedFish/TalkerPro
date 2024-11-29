@@ -1,15 +1,18 @@
-package org.example.talker.config;
+package org.example.starksparkservice.config;
 
-import org.example.talker.entity.TalkMessage;
+
+
+import org.example.starksparkservice.entity.TalkMessage;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
 /**
  * 这个类是redis的配置类，用于配置redis的连接信息，包括连接地址、密码等。
  *
@@ -40,6 +43,29 @@ public class RedissonConfig {
         config.useSingleServer().setAddress("redis://localhost:6379");
         return Redisson.create(config);
     }
+
+    @Bean
+    public RedisTemplate<String, String> redisTemplateString() {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+
+        // 设置连接工厂
+        template.setConnectionFactory(redisConnectionFactory());
+
+        // 设置键和值的序列化器为 StringRedisSerializer
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+
+        // 设置哈希键和值的序列化器（如果需要操作哈希类型）
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new StringRedisSerializer());
+
+        // 初始化配置
+        template.afterPropertiesSet();
+
+        return template;
+    }
+
+
 }
 
 

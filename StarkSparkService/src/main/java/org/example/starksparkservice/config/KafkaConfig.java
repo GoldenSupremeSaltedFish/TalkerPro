@@ -1,9 +1,12 @@
-package org.example.talker.config;
+package org.example.starksparkservice.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.example.talker.entity.Kafka.KafkaMessage;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+
+import org.example.starksparkservice.entity.KafkaMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +17,6 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +28,6 @@ public class KafkaConfig {
     @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${kafka.topics.messageToMysql}")
-    private String messageToMysqlTopic;
-
-    @Value("${kafka.topics.deadLetterQueue}")
-    private String deadLetterQueueTopic;
-
-    @Value("${kafka.topics.deadLetterQueue}")
-    private String delayedMessagesTopic;
-
     @Value("${kafka.consumer.group-id}")
     private String groupId;
 
@@ -45,29 +37,8 @@ public class KafkaConfig {
     @Value("${kafka.topics.SendToSparkVip}")
     private String sendToSparkVipTopic;
 
-    @Bean
-    public NewTopic myTopic() {
-        return TopicBuilder.name(messageToMysqlTopic)
-                .partitions(1)
-                .replicas(2)
-                .build();
-    }
-
-    @Bean
-    public NewTopic delayedTopic() {
-        return TopicBuilder.name(deadLetterQueueTopic)
-                .partitions(1)
-                .replicas(2)
-                .build();
-    }
-
-    @Bean
-    public NewTopic deadLetterTopic() {
-        return TopicBuilder.name(delayedMessagesTopic)
-                .partitions(1)
-                .replicas(2)
-                .build();
-    }
+    @Value("${kafka.topics.CallbackTopic}")
+    private String CallbackTopic;
 
     @Bean
     public NewTopic SendToSparkNormal()
@@ -85,7 +56,15 @@ public class KafkaConfig {
                 .partitions(1)
                 .replicas(2)
                 .build();
+    }@Bean
+    public NewTopic CallbackTopic()
+    {
+        return TopicBuilder.name(CallbackTopic)
+                .partitions(1)
+                .replicas(2)
+                .build();
     }
+
 
     @Bean
     public ProducerFactory<String, KafkaMessage> producerFactory() {
@@ -111,8 +90,10 @@ public class KafkaConfig {
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+//        System.out.println("消费者配置：" + props);
+//        System.out.println("canshu"+bootstrapServers+groupId+sendToSparkNormalTopic+sendToSparkVipTopic);
         return props;
     }
 
