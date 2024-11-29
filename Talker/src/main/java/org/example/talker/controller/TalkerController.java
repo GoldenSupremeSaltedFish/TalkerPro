@@ -87,7 +87,7 @@ public class TalkerController {
     {
          //基于ip限流
 
-        int remoteAddr = request.getSenderId();
+        String remoteAddr = request.getSenderId();
         Entry entry=null;// 创建一个Entry对象，用于记录进入Sentinel的规则
         try {
             entry= SphU.entry("", EntryType.IN,10,remoteAddr);// 进入Sentinel的规则

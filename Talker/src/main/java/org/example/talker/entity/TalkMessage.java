@@ -14,10 +14,10 @@ public class TalkMessage {
     // Getters
     private String messageid;
     private String message;
-    private int senderid;
-    private int receiverid;
+    private String senderid;
+    private String receiverid;
 
-    public TalkMessage(String messageid, String message, int senderid, int receiverid) {
+    public TalkMessage(String messageid, String message, String senderid, String receiverid) {
         this.messageid = messageid;
         this.message = message;
         this.senderid = senderid;
@@ -33,11 +33,11 @@ public class TalkMessage {
         this.message = message;
     }
 
-    public void setSenderid(int senderid) {
+    public void setSenderid(String senderid) {
         this.senderid = senderid;
     }
 
-    public void setReceiverid(int receiverid) {
+    public void setReceiverid(String receiverid) {
         this.receiverid = receiverid;
     }
 }

@@ -10,7 +10,7 @@ public class TalkerRequest {
     // getter 和 setter 方法
 
     private String body;
-    private int senderId;
-    private int receiverId;
+    private String senderId;
+    private String receiverId;
 
 }

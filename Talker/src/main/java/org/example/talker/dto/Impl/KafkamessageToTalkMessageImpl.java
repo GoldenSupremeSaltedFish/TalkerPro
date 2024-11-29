@@ -16,8 +16,8 @@ import java.util.Map;
  */
 public class KafkamessageToTalkMessageImpl implements KafkaTRTalk {
 
-    private int senderid;
-    private int receiverid;
+    private String senderid;
+    private String receiverid;
     private long timestamp;
     @Override
     public TalkMessage KafkaToTalk(KafkaMessage kafkaMessage) {
