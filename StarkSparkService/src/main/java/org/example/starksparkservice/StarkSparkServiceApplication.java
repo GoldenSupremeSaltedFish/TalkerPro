@@ -13,8 +13,6 @@ public class StarkSparkServiceApplication {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(StarkSparkServiceApplication.class, args);
-
-
     }
 
 }
