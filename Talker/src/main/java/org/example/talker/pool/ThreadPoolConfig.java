@@ -1,4 +1,4 @@
-package org.example.talker.threadpool;
+package org.example.talker.pool;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,5 +1,6 @@
 package org.example.talker.kafka;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.example.talker.entity.Kafka.KafkaMessage;
 
 public interface KafkaConsumer {
@@ -13,4 +14,5 @@ public interface KafkaConsumer {
 
     KafkaMessage receiveDelayTopic();
 
+    void receiveCallBackTopic(ConsumerRecord<String, KafkaMessage> record);
 }

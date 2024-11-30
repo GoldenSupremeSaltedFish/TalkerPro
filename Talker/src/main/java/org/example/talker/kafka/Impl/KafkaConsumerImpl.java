@@ -65,6 +65,18 @@ public class KafkaConsumerImpl implements KafkaConsumer {
         return null;
     }
 
+
+    @Override
+    @KafkaListener(topics = "${kafka.topics.CallbackTopic}", groupId = "${kafka.consumer.group-id}")
+    public void receiveCallBackTopic(ConsumerRecord<String, KafkaMessage> record) {
+        try {
+            KafkaMessage message = record.value();
+            
+        } catch (Exception e) {
+            log.error("处理消息时发生错误", e);
+        }
+    }
+
     private void processMessageWithLeakyBucket(KafkaMessage message) {
         long currentTime = System.currentTimeMillis();
         long timeSinceLastProcess = currentTime - lastProcessTime;
