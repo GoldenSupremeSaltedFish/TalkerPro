@@ -1,6 +1,7 @@
 package org.example.starksparkservice.StartSpark;
 import com.alibaba.nacos.shaded.com.google.gson.Gson;
 import jakarta.annotation.Resource;
+import org.example.starksparkservice.entity.DeductionRecord;
 import org.example.starksparkservice.entity.KafkaMessage;
 import org.example.starksparkservice.entity.sparkResponse;
 import org.example.starksparkservice.mapper.DeductionRecordMapper;
@@ -108,6 +109,7 @@ public class SparkApiTalkService {
          // input messageid,test,token(冗余字段可以做双向对账)
 
 
+         // 更新数据库
          updateDatabase(sid, response.getTokenUsage());
 
          sendToAcceptQueue(kafkaMessage);
@@ -131,11 +133,14 @@ public class SparkApiTalkService {
       }
       lastConsumeTime.set(System.nanoTime());
    }
-   private void updateDatabase(String sid, int tokenused)
+   private void updateDatabase(String userID, int tokenused)
    {
-     deductionRecordMapper.uodatepoint(sid,tokenused);
-
+      deductionRecordMapper.uodatepoint(userID,tokenused);
+      DeductionRecord deductionRecord = new DeductionRecord(userID, tokenused,"${spark.clusternum}");
+      deductionRecordMapper.insertDeductionRecord(deductionRecord);
    };
+
+
    //已经设置为true自动提交
 //   private void updateKafkaOffset(String messageId) {
 //
