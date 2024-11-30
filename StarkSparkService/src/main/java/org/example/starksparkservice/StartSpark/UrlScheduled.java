@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2024/11/26
  * @time 下午12:04
  */
-@Component
+@Service
 public class UrlScheduled {
     private static final Logger logger = LoggerFactory.getLogger(UrlScheduled.class);
 

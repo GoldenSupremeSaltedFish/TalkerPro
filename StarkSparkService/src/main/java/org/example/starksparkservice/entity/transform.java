@@ -1,6 +1,8 @@
 package org.example.starksparkservice.entity;
 
 import org.example.starksparkservice.utils.SparkPost;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+
 import java.util.HashMap;
 import java.util.Map;
 /**
@@ -46,7 +48,7 @@ public class transform {
         // 构造 Payload
         SparkPost.Payload.Message message = new SparkPost.Payload.Message(
                 "user",                 // 默认角色为 "user"
-                kafkaMessage.getcontent() // 使用 Kafka 消息的内容作为对话输入
+                kafkaMessage.getContent() // 使用 Kafka 消息的内容作为对话输入
         );
         SparkPost.Payload payload = new SparkPost.Payload(message);
 
@@ -60,7 +62,7 @@ public class transform {
      * @param sparkResponse Spark 响应对象
      * @return 转换后的 Kafka 消息对象
      */
-    public static KafkaMessage SparkToKafka(sparkResponse sparkResponse, String sender, int recipient) {
+    public static KafkaMessage SparkToKafka(sparkResponse sparkResponse, String sender, String recipient) {
         // 从 SparkResponse 中提取数据
         String messageId = sparkResponse.getSid(); // 使用 sid 作为唯一标识
         String content = sparkResponse.getContent(); // 获取 AI 返回的内容

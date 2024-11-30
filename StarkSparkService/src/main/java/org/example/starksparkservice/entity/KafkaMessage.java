@@ -15,19 +15,17 @@ import java.util.Map;
  * @since 2024-11-20
  *
  */
-@Getter
-@Setter
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class KafkaMessage {
     private String messageId;  // 消息唯一标识
     private String content;    // 消息内容
     private String sender;        // 发送者
-    private int recipient;     // 接收者
+    private String recipient;     // 接收者
     private long timestamp;    // 消息时间戳
     private Map<String, String> metadata;
 
-    public String getcontent() {
-        return content;
-    }
 }

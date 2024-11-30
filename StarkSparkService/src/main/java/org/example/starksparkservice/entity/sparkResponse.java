@@ -14,13 +14,22 @@ import java.util.Map;
  * @date 2024/11/27
  * @time 下午11:59
  */
-@Getter
-@Setter
+
 public class sparkResponse {
+    @Getter
+    @Setter
     private String sender;
-    private String sid;        // 会话唯一 ID
-    private int status;        // 响应状态
-    private String content;    // AI的回答内容
+    @Getter
+    @Setter
+    private String sid;
+    @Getter
+    @Setter// 会话唯一 ID
+    private int status;
+    @Getter
+    @Setter// 响应状态
+    private String content;
+    @Getter
+    @Setter// AI的回答内容
     private int tokenUsage;    // Token 消耗数量
 
     // 构造函数
@@ -36,40 +45,76 @@ public class sparkResponse {
 
     // 静态方法：从 API 响应中创建 sparkResponse 对象
     public static sparkResponse fromApiResponse(Map<String, Object> apiResponse) {
-        Map<String, Object> header = (Map<String, Object>) apiResponse.get("header");
-        Map<String, Object> payload = (Map<String, Object>) apiResponse.get("payload");
+        try {
+            // 提取 header 和 payload
+            Map<String, Object> header = safeGetAsMap(apiResponse, "header");
+            Map<String, Object> payload = safeGetAsMap(apiResponse, "payload");
 
-        String sid = (String) header.get("sid");  // 提取 sid
-        int status = (int) header.get("status"); // 提取状态
+            // 获取 sid 和 status
+            String sid = safeGetAsString(header, "sid");
+            int status = safeGetAsInt(header, "status");
 
-        // 提取 content
-        List<Map<String, Object>> choices = (List<Map<String, Object>>) payload.get("choices");
-        StringBuilder contentBuilder = new StringBuilder();
-        int tokenUsage = 0;
+            // 提取 content 文本拼接
+            StringBuilder contentBuilder = new StringBuilder();
+            Map<String, Object> choices = safeGetAsMap(payload, "choices");
+            if (choices != null) {
+                int choiceStatus = safeGetAsInt(choices, "status");
+                List<?> textList = safeGetAsList(choices, "text");
 
-        if (choices != null && !choices.isEmpty()) {
-            for (Map<String, Object> choice : choices) {
-                String content = (String) choice.get("content");
-                int seqStatus = (int) choice.get("status");
+                if (textList != null && !textList.isEmpty()) {
+                    Object firstItem = textList.get(0);
+                    if (firstItem instanceof Map) {
+                        Map<?, ?> textMap = (Map<?, ?>) firstItem;
+                        String content = safeGetAsString(textMap, "content");
 
-                if (seqStatus == 0) {
-                    contentBuilder.append("[开始]").append(content);
-                } else if (seqStatus == 1) {
-                    contentBuilder.append(content);
-                } else if (seqStatus == 2) {
-                    contentBuilder.append("[结束]").append(content);
+                        if (choiceStatus == 0) {
+                            contentBuilder.append("[开始]").append(content);
+                        } else if (choiceStatus == 1) {
+                            contentBuilder.append(content);
+                        } else if (choiceStatus == 2) {
+                            contentBuilder.append("[结束]").append(content);
+                        }
+                    }
                 }
             }
-        }
 
-        // 提取 Token 消耗信息
-        Map<String, Object> usage = (Map<String, Object>) payload.get("usage");
-        if (usage != null) {
-            tokenUsage = (int) usage.getOrDefault("total_tokens", 0);
-        }
+            // 提取 Token 使用情况
+            int tokenUsage = 0;
+            if (status == 2 && payload.containsKey("usage")) {
+                Map<String, Object> usage = safeGetAsMap(payload, "usage");
+                Map<String, Object> textUsage = safeGetAsMap(usage, "text");
+                tokenUsage = safeGetAsInt(textUsage, "total_tokens");
+            }
 
-        return new sparkResponse(sid, status, contentBuilder.toString(), tokenUsage);
+            // 创建并返回 sparkResponse 实例
+            return new sparkResponse(sid, status, contentBuilder.toString(), tokenUsage);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("API response format is invalid", e);
+        }
     }
+
+    // 辅助方法：安全类型转换
+    private static Map<String, Object> safeGetAsMap(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return (value instanceof Map) ? (Map<String, Object>) value : null;
+    }
+
+    private static List<?> safeGetAsList(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return (value instanceof List) ? (List<?>) value : null;
+    }
+
+    private static String safeGetAsString(Map<?, ?> map, String key) {
+        Object value = map.get(key);
+        return (value instanceof String) ? (String) value : null;
+    }
+
+    private static int safeGetAsInt(Map<?, ?> map, String key) {
+        Object value = map.get(key);
+        return (value instanceof Number) ? ((Number) value).intValue() : 0;
+    }
+
+
 
     @Override
     public String toString() {

@@ -1,6 +1,5 @@
 package org.example.starksparkservice.StartSpark;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.nacos.shaded.com.google.gson.Gson;
 import jakarta.annotation.Resource;
 import org.example.starksparkservice.entity.KafkaMessage;
 import org.example.starksparkservice.entity.sparkResponse;
@@ -8,12 +7,13 @@ import org.example.starksparkservice.mapper.DeductionRecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import com.google.gson.Gson;
+
 import com.google.gson.reflect.TypeToken;
 
 import static org.example.starksparkservice.entity.transform.SparkToKafka;
@@ -30,17 +30,20 @@ import static org.example.starksparkservice.entity.transform.SparkToKafka;
 @Service
 public class SparkApiTalkService {
 
+
+   private StringBuilder contentBuilder = new StringBuilder();
+   private int totalTokenUsage = 0;
    @Resource
    private DeductionRecordMapper deductionRecordMapper;
 
    @Value("${spark.clusternum}")
-   int serviceid;
+   String serviced;
 
    @Autowired
    private StarkSparkApiService starkSparkApiService;
 
    @Autowired
-   private KafkaTemplate<String, KafkaMessage> kafkaTemplate; // Kafka 发送模板
+   private KafkaTemplate<String, KafkaMessage> kafkaTemplate;
 
 
    private static final long QPS_LIMIT = 2;
@@ -58,8 +61,7 @@ public class SparkApiTalkService {
    }
 
    private void processMessage(KafkaMessage message, String topic) {
-      System.out.printf("Topic: %s, Received Message ID: %s, Content: %s%n",
-              topic, message.getMessageId(), message.getcontent());
+
 
       invokeSparkApi(message);
       //由于业务的延迟性很高，直接在这里更新偏移量
@@ -70,7 +72,7 @@ public class SparkApiTalkService {
    void invokeSparkApi(KafkaMessage message) {
       String sender = message.getSender();
       String messageId = message.getMessageId();
-      String messageContent = message.getcontent();
+      String messageContent = message.getContent();
 
       try {
          // 调用 WebSocket API，使用回调处理响应
@@ -83,7 +85,7 @@ public class SparkApiTalkService {
             @Override
             public void onError(Exception e) {
                System.err.println("WebSocket Error for Message ID: " + messageId);
-               e.printStackTrace();
+//               e.printStackTrace();
             }
          });
       } catch (Exception e) {
@@ -94,14 +96,15 @@ public class SparkApiTalkService {
    private void handleResponse(String messageId, String sid, String responseText) {
       try {
          // 解析响应并生成 sparkResponse 对象
-         Gson gson = new Gson();
+
+         Gson gson=new Gson();
          Map<String, Object> apiResponse = gson.fromJson(responseText, new TypeToken<Map<String, Object>>() {}.getType());
-         sparkResponse response = sparkResponse.fromApiResponse(apiResponse);
+         sparkResponse response = sparkResponse.fromApiResponse(apiResponse);//
 
          System.out.println("Received response for Message ID: " + messageId);//
          System.out.println("Response Content: " + response.getContent());
          //调用reputekafka+sid
-         KafkaMessage kafkaMessage=SparkToKafka(response, sid,serviceid);// 调用方法，传入 response 对象, 并传入 sid（sender用来查找）, 并传入 当前apiid（扩展）
+         KafkaMessage kafkaMessage=SparkToKafka(response, sid, serviced);// 调用方法，传入 response 对象, 并传入 sid（sender用来查找）, 并传入 当前apiid（扩展）
          // input messageid,test,token(冗余字段可以做双向对账)
 
 
@@ -130,7 +133,7 @@ public class SparkApiTalkService {
    }
    private void updateDatabase(String sid, int tokenused)
    {
-     deductionRecordMapper.deductPoints(sid,tokenused);
+     deductionRecordMapper.uodatepoint(sid,tokenused);
 
    };
    //已经设置为true自动提交

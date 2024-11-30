@@ -29,5 +29,5 @@ public class StarkSparkConfig {
     private String PATH;
     @Value("${spring.spark.method}")
     private String METHOD;
-    StarkSparkConfig(){}
+
 }

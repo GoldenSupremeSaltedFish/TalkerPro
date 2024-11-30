@@ -1,6 +1,7 @@
 package org.example.starksparkservice.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 这个类用于存储消息。
@@ -10,8 +11,10 @@ import lombok.Getter;
  * @since 2024-11-20
  *
  */
+@Setter
 @Getter
 public class TalkMessage {
+    // Setters
     // Getters
     private String messageid;
     private String message;
@@ -25,20 +28,4 @@ public class TalkMessage {
         this.receiverid = receiverid;
     }
 
-    // Setters
-    public void setMessageid(String messageid) {
-        this.messageid = messageid;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public void setSenderid(int senderid) {
-        this.senderid = senderid;
-    }
-
-    public void setReceiverid(int receiverid) {
-        this.receiverid = receiverid;
-    }
 }

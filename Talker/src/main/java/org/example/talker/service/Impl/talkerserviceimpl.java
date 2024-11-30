@@ -59,7 +59,7 @@ public class talkerserviceimpl implements talkservice {
             return false;
         }
         // 检查 senderid 和 receiverid 是否为正数
-        if (talkMessage.getSenderid() <= 0 || talkMessage.getReceiverid() <= 0) {
+        if (talkMessage.getSenderid() !=null || talkMessage.getReceiverid() !=null) {
             return false;
         }
         // 所有检查都通过，实例合法

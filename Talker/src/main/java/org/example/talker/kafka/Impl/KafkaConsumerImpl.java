@@ -2,14 +2,14 @@ package org.example.talker.kafka.Impl;
 
 import jakarta.annotation.Resource;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.example.talker.config.KafkaProperties;
+
 import org.example.talker.dto.KafkaTRTalk;
 import org.example.talker.entity.Kafka.KafkaMessage;
 import org.example.talker.kafka.KafkaConsumer;
 import org.example.talker.mapper.MessageMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;

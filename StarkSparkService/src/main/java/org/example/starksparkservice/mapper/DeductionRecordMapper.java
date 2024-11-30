@@ -28,5 +28,5 @@ public interface DeductionRecordMapper {
         WHERE account_id = #{accountId}
           AND points >= #{tokenUsed}
     """)
-    int deductPoints(@Param("accountId") String accountId, @Param("tokenUsed") int tokenUsed);
+    void uodatepoint(@Param("accountId") String accountId, @Param("tokenUsed") int tokenUsed);
 }

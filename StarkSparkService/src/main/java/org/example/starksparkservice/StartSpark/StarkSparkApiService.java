@@ -6,11 +6,21 @@ import org.example.starksparkservice.entity.sparkResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-@Component
+
+
+/**
+ * @author HumphreyLi
+ * @version 1.0
+ * @brief 实现api的调用，经过ai处理返回token值
+ * @details
+ * @date 2024/11/27
+ * @time 下午8:36
+ */
+@Service
 public class StarkSparkApiService extends WebSocketListener {
     public static final String domain = "4.0Ultra";
     public static final String appid = "366419e5";
@@ -31,7 +41,9 @@ public class StarkSparkApiService extends WebSocketListener {
 
         OkHttpClient client = new OkHttpClient.Builder().build();
         Request request = new Request.Builder().url(url).build();
+        // 建立 WebSocket 连接
         WebSocket webSocket = client.newWebSocket(request, new WebSocketListener() {
+            // 连接成功
             @Override
             public void onMessage(WebSocket webSocket, String text) {
                 try {
@@ -112,21 +124,6 @@ public class StarkSparkApiService extends WebSocketListener {
         requestJson.put("payload", payload);
 
         webSocket.send(requestJson.toString());
-    }
-
-    @Override
-    public void onMessage(WebSocket webSocket, String text) {
-        System.out.println(getFormattedDate() + " 大模型响应：" + text);
-
-        try {
-            Map<String, Object> apiResponse = JSONObject.parseObject(text, Map.class);
-            sparkResponse response = sparkResponse.fromApiResponse(apiResponse);
-
-            System.out.println("拼接消息：" + response.getContent());
-            System.out.println("Token 消耗：" + response.getTokenUsage());
-        } catch (Exception e) {
-            System.err.println("解析响应失败：" + e.getMessage());
-        }
     }
 
     private static @NotNull String getFormattedDate() {

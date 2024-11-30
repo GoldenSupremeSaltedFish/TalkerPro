@@ -2,6 +2,7 @@ package org.example.starksparkservice.config;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -22,7 +23,7 @@ import java.util.TimeZone;
  * @date 2024/11/26
  * @time 上午1:49
  */
-@Service
+@Component
 public class StarSparkAuthUtils {
 
     // 将静态字段改为实例字段

@@ -15,6 +15,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableWebFlux
 @EnableDiscoveryClient
 @EnableScheduling
+
 public class TalkerApplication {
 
     public static void main(String[] args) {
