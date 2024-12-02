@@ -42,8 +42,8 @@ public class TalkerController {
 
     @JwtToken// 使用JwtToken注解，表示需要进行JWT验证
     @PostMapping("/talker")
-    @Async("taskExecutor")
-    public CompletableFuture<Map<String, Object>> talker(@RequestBody TalkerRequest request) {
+    @Async("taskExecutor")// 异步处理请求
+    public CompletableFuture<Map<String, Object>> talker(@RequestBody TalkerRequest request) throws InterruptedException {
 
         return getMapCompletableFuture(request);
         // 返回一个CompletableFuture对象，表示异步操作的结果
@@ -53,34 +53,40 @@ public class TalkerController {
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String shortUuid = uuid.substring(0, 5);
 
-        TalkMessage talkMessages = new TalkMessage(shortUuid, request.getBody(), request.getSenderId(), request.getReceiverId());
+        TalkMessage talkMessage = new TalkMessage(shortUuid, request.getBody(), request.getSenderId(), request.getReceiverId());
         Map<String, Object> response = new HashMap<>();
-        if(talkerservice.IsMessageRight(talkMessages))
-        {
 
-
-            talkerservice.MessagetoKafka(talkMessages);
-
-        }
-        else
-        {
+        if (!talkerservice.IsMessageRight(talkMessage)) {
             response.put("status", "error");
             response.put("code", "ERR_" + shortUuid);
             response.put("message", "消息发送失败");
+            return CompletableFuture.completedFuture(response);
         }
 
-        response.put("status", "success");
-        response.put("code", shortUuid);
-        response.put("message", "消息发送成功");
-        return CompletableFuture.completedFuture(response);// 返回一个CompletableFuture对象，表示异步操作的结果
+        // 发送消息并异步接收
+        return talkerservice.MessagetoKafkaAsync(talkMessage)
+                .thenCompose(unused -> talkerservice.MessagefromKafkaAsync(shortUuid)) // 等待 Kafka 消息
+                .thenApply(receivedMessage -> {
+                    if (receivedMessage != null) {
+                        response.put("status", "success");
+                        response.put("code", "success_" + shortUuid);
+                        response.put("message", receivedMessage.getMessage());
+                    } else {
+                        response.put("status", "error");
+                        response.put("code", "TIMEOUT_" + shortUuid);
+                        response.put("message", "消息接收超时");
+                    }
+                    return response;
+                });
     }
+
 
     /**
      * 限流版talker
      */
     @JwtToken// 使用JwtToken注解，表示需要进行JWT验证
     @PostMapping("/talker/User")
-    @Async("taskExecutor")
+    @Async("taskExecutor")// 异步处理请求,线程池支持
 
     //如果不使用注解，那么需要手动提交
     public CompletableFuture<Map<String, Object>> talkerForHotKey(@RequestBody TalkerRequest request)
@@ -109,7 +115,7 @@ public class TalkerController {
                 //直接调用mini模型的api
 
             }
-            System.out.println("限流处理");
+
         }
         finally {
             if(entry!=null)

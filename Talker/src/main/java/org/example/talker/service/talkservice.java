@@ -2,6 +2,8 @@ package org.example.talker.service;
 
 import org.example.talker.entity.TalkMessage;
 
+import java.util.concurrent.CompletableFuture;
+
 
 public interface talkservice {
 
@@ -11,8 +13,9 @@ public interface talkservice {
 
     boolean IsMessageRight(TalkMessage talkMessage);
 
-    String MessagetoKafka(TalkMessage talkMessage);
+    CompletableFuture<Void> MessagetoKafkaAsync(TalkMessage talkMessage);
 
-    TalkMessage MessagefromKafka(String messageid);
+    CompletableFuture<TalkMessage> MessagefromKafkaAsync(String messageid) throws InterruptedException;
+    public String MessagetoKafka(TalkMessage talkMessage);
 
 }

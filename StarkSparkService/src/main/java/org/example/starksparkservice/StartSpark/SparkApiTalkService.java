@@ -154,6 +154,6 @@ public class SparkApiTalkService {
 
    private void sendToAcceptQueue(KafkaMessage kafkaMessage) {
 
-      kafkaTemplate.send("${kafka.topics.CallbackTopic}", kafkaMessage);
+      kafkaTemplate.send("${kafka.topics.CallbackTopic}",kafkaMessage.getMessageId(), kafkaMessage);//参数分别为 主题，消息id，消息
    }
 }
