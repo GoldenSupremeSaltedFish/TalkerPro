@@ -23,22 +23,23 @@ public class AESUtilImpl implements AESUtil {
     private static final int GCM_TAG_LENGTH = 128;
 
     public  String decrypt(String encryptedData) throws Exception {
-        byte[] decodedData = Base64.getDecoder().decode(encryptedData);
-
-        // 从密文中提取 IV
-        ByteBuffer buffer = ByteBuffer.wrap(decodedData);
-        byte[] iv = new byte[GCM_IV_LENGTH];
-        buffer.get(iv);
-        byte[] ciphertext = new byte[buffer.remaining()];
-        buffer.get(ciphertext);
-
-        SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        GCMParameterSpec parameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
-
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
-        byte[] decryptedData = cipher.doFinal(ciphertext);
-
-        return new String(decryptedData);
+//        byte[] decodedData = Base64.getDecoder().decode(encryptedData);
+//
+//        // 从密文中提取 IV
+//        ByteBuffer buffer = ByteBuffer.wrap(decodedData);
+//        byte[] iv = new byte[GCM_IV_LENGTH];
+//        buffer.get(iv);
+//        byte[] ciphertext = new byte[buffer.remaining()];
+//        buffer.get(ciphertext);
+//
+//        SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+//        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+//        GCMParameterSpec parameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+//
+//        cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
+//        byte[] decryptedData = cipher.doFinal(ciphertext);
+//
+//        return new String(decryptedData);
+        return encryptedData;
     }
 }

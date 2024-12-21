@@ -80,6 +80,29 @@ public class TalkerController {
                 });
     }
 
+//todo
+// [Client] ---> [HTTP API] ---> [Kafka / RabbitMQ] ---> [ai] ---> [kafka] ---> [call back(sse)/may be push]
+// 将处理好的数据推给客户端
+// 尝试使用sse进行数据推送
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 限流版talker

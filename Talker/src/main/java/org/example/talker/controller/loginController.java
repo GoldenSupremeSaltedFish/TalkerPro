@@ -7,9 +7,12 @@ import org.example.talker.controller.http.Loginrequest;
 import org.example.talker.dao.Redis.BloomFilterValidator;
 import org.example.talker.service.Login;
 import org.example.talker.util.Impl.AESUtil;
+import org.example.talker.util.Impl.AESUtilImpl;
 import org.example.talker.util.Impl.JWTUtils;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,10 +35,11 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class loginController {
+    private static final Logger log = LoggerFactory.getLogger(loginController.class);
     @Autowired
     private Login login;
     private final RedissonClient redissonClient;
-    private AESUtil aesUtil;
+
     private final BloomFilterValidator bloomFilterValidator;
 
     public loginController(RedissonClient redissonClient, BloomFilterValidator bloomFilterValidator) {
@@ -46,16 +50,20 @@ public class loginController {
     @PostMapping("/login")
     @SentinelResource(value = "login", blockHandler = "handleBlockException", fallback = "handleFallback")
     public CompletableFuture<Loginrequest> login(@RequestBody Loginpost request) {
+
         return CompletableFuture.supplyAsync(() -> {
+            String token = "emm";
+            String username = null;
             try {
-                String token = "";
-                String username = request.getName();
+                token = "empty";
+                username = request.getName();
                 String Fakepassword = request.getPassword();
                 String email = request.getEmail();
                 String role = null;
                 Map<String, String> JWter = new HashMap<>();
-
-                String encryptedPassword = aesUtil.decrypt(Fakepassword);
+//todo 加密
+//                String encryptedPassword = aesUtil.decrypt(Fakepassword);
+                String encryptedPassword = Fakepassword;
                 if (email == null && username != null) {
                     role = login.loginforpassword(username, Fakepassword);
                 }
@@ -73,7 +81,12 @@ public class loginController {
                 }
                 return new Loginrequest(token, username);
             } catch (Exception e) {
-                return new Loginrequest("error", "An error occurred during login");
+                log.error("login error", e);
+                e.printStackTrace();
+                return new Loginrequest(token, username);
+            } finally {
+
+                return new Loginrequest(token, username);
             }
         });
     }

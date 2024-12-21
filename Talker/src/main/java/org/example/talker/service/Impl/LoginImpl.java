@@ -29,11 +29,15 @@ public class LoginImpl implements Login {
 
     @Override
     public String loginforpassword(String Dname, String Dpassword) throws Exception {
-        String realname=aesUtil.decrypt(Dname);
-        String realpassword=aesUtil.decrypt(Dpassword);
+        //todo 解密
+//         String realname=aesUtil.decrypt(Dname);
+        String realname=Dname;
+        //todo 解密
+//         String realpassword=aesUtil.decrypt(Dpassword);
+        String realpassword=Dpassword;
         String sqlpassword =userMapper.getPasswordByName(realname);
         String role=userMapper.getRoleByName(realname);
-        if(realpassword.equals(Dpassword))
+        if(realpassword.equals(sqlpassword))
         {
             return role;
         }
@@ -46,7 +50,9 @@ public class LoginImpl implements Login {
 
     @Override
     public String loginforEmail(String Demail, String Dpassword) throws Exception {
-        String realemail=aesUtil.decrypt(Demail);
+        //todo 解密
+//         String realemail=aesUtil.decrypt(Demail);
+        String realemail=Demail;
         String realpassword=aesUtil.decrypt(Dpassword);
         String sqlpassword =userMapper.getPasswordByEmail(realemail);
         String role=userMapper.getRoleByEmail(realemail);
