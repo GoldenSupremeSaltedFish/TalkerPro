@@ -7,7 +7,7 @@ import org.example.payoff.entiy.AccountBalance;
 import org.example.payoff.entiy.AccountPayment;
 
 @Mapper
-public interface Account_payment {
+public interface AccountPaymentMapper {
     @Select("SELECT *FROM  account_balance where account_id = #{account_id}")
     public AccountBalance getAccountPaymentByAccountId(String account_id);
 

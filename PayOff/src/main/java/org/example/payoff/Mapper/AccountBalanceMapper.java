@@ -5,14 +5,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.example.payoff.entiy.AccountBalance;
-import org.example.payoff.entiy.AccountPayment;
 import org.example.payoff.entiy.DeductionRecord;
 
 import java.sql.Timestamp;
 
 
 @Mapper
-public interface Account_balance {
+public interface AccountBalanceMapper {
     @Select("SELECT * FROM account_balance WHERE account_id = #{account_id}")
     public AccountBalance GetAllById(int account_id);
 
