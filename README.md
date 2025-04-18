@@ -84,13 +84,55 @@ cd Talker
 mvn spring-boot:run
 ```
 
-## 贡献指南
 
-欢迎提交Pull Request。请确保:
-- 代码风格一致
-- 包含必要的测试
-- 更新相关文档
+## 配置管理
 
-## 许可证
+本项目使用 Nacos 作为配置中心，管理以下敏感和可配置信息：
 
-MIT License
+### 已配置在 Nacos 中的参数
+
+1. **Spark AI 相关配置**:
+   - `spark.clusternum`: 星火大模型集群编号
+   - 星火大模型认证URL (通过Redis缓存)
+
+2. **Kafka 相关配置**:
+   - `kafka.topics.SendToSparkNormal`: 普通消息发送主题
+   - `kafka.topics.CallbackTopic`: 回调主题 
+   - `kafka.consumer.group-id`: 消费者组ID
+
+3. **数据库连接配置**:
+   - 数据库连接字符串
+   - 用户名和密码
+
+### 配置使用方式
+
+在代码中通过 `@Value` 注解注入配置，例如:
+
+```java
+@Value("${spark.clusternum}")
+String serviced;
+```
+
+### 配置更新策略
+
+1. **动态刷新**: 支持配置热更新，无需重启服务
+2. **多环境隔离**: 通过 namespace 区分不同环境配置
+3. **版本控制**: 所有配置变更都有版本记录
+
+## 配置安全
+
+1. 敏感配置(如密码)已加密存储
+2. 配置访问权限按角色严格控制
+3. 生产环境配置与开发测试环境完全隔离
+
+## 如何添加新配置
+
+1. 在 Nacos 控制台添加新配置项
+2. 在代码中通过 `@Value` 注入使用
+3. 更新本 README 文档记录新配置项
+
+## 最佳实践
+
+- 所有环境相关配置都应放在 Nacos 中
+- 本地开发时使用 dev 命名空间的配置
+- 重要配置变更需经过评审
