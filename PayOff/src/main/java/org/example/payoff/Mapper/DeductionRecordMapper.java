@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Select;
 import org.example.payoff.entiy.DeductionRecord;
 
 @Mapper
-public interface Deduction_record {
+public interface DeductionRecordMapper {
     @Select("SELECT * FROM deduction_record WHERE userid = #{userid}")
     public String getDeductionRecordByUserId(String userid);
 
