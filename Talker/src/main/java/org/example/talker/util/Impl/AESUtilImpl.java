@@ -1,12 +1,6 @@
 package org.example.talker.util.Impl;
 
-import org.springframework.stereotype.Component;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
-import java.util.Base64;
 
 /**
  * 这个类是AES加密解密的实现类，用于实现AES加密解密的功能。

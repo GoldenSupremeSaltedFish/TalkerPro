@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -64,10 +64,10 @@ import java.util.Map;
         public Map<String, String> validateTokenforUser(JoinPoint joinPoint, JwtToken jwtToken) throws Exception {
             // 1. 获取令牌
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
             HttpServletRequest request = (HttpServletRequest) attributes.getRequest();
             HttpServletResponse response = (HttpServletResponse) attributes.getResponse();
-            //todo
-            // 危险的强制转换
+
             String token = extractToken(request);
             if (token == null) {
                 rejectRequest(response, "No JWT token found in request headers");
@@ -101,5 +101,25 @@ import java.util.Map;
             response.getWriter().write("{\"error\": \"" + message + "\"}");
             response.getWriter().flush();// 刷新输出流
         }
+    public Map<String, String> tokentomap(String token) throws Exception {
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(SING);
+            DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+
+            // 提取所有所需的 Claim 值
+            Map<String, String> tokenData = new HashMap<>();
+            tokenData.put("email", jwt.getClaim("email").asString());
+            tokenData.put("user", jwt.getClaim("user").asString());
+            tokenData.put("role", jwt.getClaim("role").asString());
+
+
+            return tokenData;
+        } catch (JWTVerificationException exception) {
+            throw new UnauthorizedException("Invalid JWT token");
+        }
     }
+
+
+}
 
