@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: talker-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/talker?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 123456
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: talker-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+server:
+  port: 8081
+
+kafka:
+  topics:
+    messageToMysql: messageToMysql
+    deadLetterQueue: deadLetterQueue
+    delayedMessages: delayedMessages
+    SendToSparkNormal: SendToSparkNormal
+    SendToSparkVip: SendToSparkVip
+    CallbackTopic: CallbackTopic
+  consumer:
+    group-id: talker-group
+  message:
+    timeout: 30000
+    poll-interval: 1000 
