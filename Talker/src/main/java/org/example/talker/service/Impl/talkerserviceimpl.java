@@ -1,11 +1,7 @@
 package org.example.talker.service.Impl;
 
 import jakarta.annotation.Resource;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.example.talker.dto.Impl.KafkamessageToTalkMessageImpl;
-import org.example.talker.dto.KafkaTRTalk;
 import org.example.talker.entity.Kafka.KafkaMessage;
 import org.example.talker.mapper.MessageMapper;
 import org.example.talker.service.talkservice;
@@ -19,14 +15,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import static java.lang.Thread.sleep;
-
 
 /**
  * 将客户端消息发送给kafka
@@ -37,29 +28,26 @@ import static java.lang.Thread.sleep;
  * @since 2024/11/16
  */
 
-
 @Service
 public class talkerserviceimpl implements talkservice {
-    private  final Logger log = LoggerFactory.getLogger(talkerserviceimpl.class);
+    private final Logger log = LoggerFactory.getLogger(talkerserviceimpl.class);
+
     @Autowired
-    KafkaTemplate<String, KafkaMessage> kafkaTemplate;
-    @Autowired
-    KafkaConsumer<String,KafkaMessage> kafkaConsumer;
+    private KafkaTemplate<String, KafkaMessage> kafkaTemplate;
+
     @Resource
     private MessageMapper messageMapper;
 
-
-    private KafkamessageToTalkMessageImpl kafkamessageToTalkMessageImpl=new KafkamessageToTalkMessageImpl();
+    private final KafkamessageToTalkMessageImpl kafkamessageToTalkMessageImpl = new KafkamessageToTalkMessageImpl();
 
     @Value("${kafka.topics.SendToSparkNormal}")
-    String topic;//目前统一向普通队列传递消息
-
+    private String topic; //目前统一向普通队列传递消息
 
     @Value("${kafka.message.timeout}")
-    private long timeout;
+    private long timeout; // Kafka 消息超时
 
     @Value("${kafka.message.poll-interval}")
-    private long pollInterval;
+    private long pollInterval; // Kafka 消息轮询间隔
 
     private final ConcurrentHashMap<String, TalkMessage> messageCache = new ConcurrentHashMap<>();
 
@@ -75,43 +63,39 @@ public class talkerserviceimpl implements talkservice {
         messageCache.put(kafkaMessage.getMessageId(), talkMessage);
     }
 
-
-
     @Override
     public String MessagetoMysql(TalkMessage talkMessage) {
-       messageMapper.insertMessage(talkMessage);
-       return talkMessage.getMessageid();//返回messageid
+        messageMapper.insertMessage(talkMessage);
+        return talkMessage.getMessageid(); // 返回messageid
     }
 
     @Override
     public TalkMessage MessagefromMysql(String messageid) {
-        TalkMessage talkMessage = messageMapper.getMessageById(messageid);
-        return talkMessage;
+        return messageMapper.getMessageById(messageid);
     }
-
 
     @Override
     public boolean IsMessageRight(TalkMessage talkMessage) {
         // 检查 talkMessage 是否为空
-        if (talkMessage == null) {
-            return false;
-        }
-        // 检查 messageid 是否为空或空字符串
-        if (talkMessage.getMessageid() == null || talkMessage.getMessageid().trim().isEmpty()) {
-            return false;
-        }
-        // 检查 message 是否为空或空字符串
-        if (talkMessage.getMessage() == null || talkMessage.getMessage().trim().isEmpty()) {
-            return false;
-        }
-
-        // 所有检查都通过，实例合法
-        return true;
+        return talkMessage != null &&
+                talkMessage.getMessageid() != null && !talkMessage.getMessageid().trim().isEmpty() &&
+                talkMessage.getMessage() != null && !talkMessage.getMessage().trim().isEmpty();
     }
 
     @Override
     public CompletableFuture<Void> MessagetoKafkaAsync(TalkMessage talkMessage) {
-        return null;
+        return CompletableFuture.runAsync(() -> {
+            try {
+                if (IsMessageRight(talkMessage)) {
+                    KafkaMessage kafkaMessage = kafkamessageToTalkMessageImpl.TalkToKafka(talkMessage);
+                    kafkaTemplate.send(topic, talkMessage.getMessageid(), kafkaMessage);
+                } else {
+                    log.error("Invalid message: {}", talkMessage);
+                }
+            } catch (Exception e) {
+                log.error("Error sending message to Kafka", e);
+            }
+        });
     }
 
     @Override
@@ -124,21 +108,19 @@ public class talkerserviceimpl implements talkservice {
             KafkaMessage kafkaMessage = kafkamessageToTalkMessageImpl.TalkToKafka(talkMessage);
             kafkaTemplate.send(topic, talkMessage.getMessageid(), kafkaMessage);
         } catch (Exception e) {
-            // 记录异常
-            e.printStackTrace();
+            log.error("Failed to store message in Redis", e);
             return "Failed to store message in Redis: " + e.getMessage();
         }
         return "";
     }
 
-
+    @Override
     public CompletableFuture<TalkMessage> MessagefromKafkaAsync(String messageId) {
         return CompletableFuture.supplyAsync(() -> {
-            TalkMessage talkMessage = null;
-            long timeout = 10000L; // 超时时间 10 秒
-            long pollInterval = 1000L; // 每次轮询间隔 1 秒
             long startTime = System.currentTimeMillis();
+            TalkMessage talkMessage = null;
 
+            // 循环直到超时
             while (System.currentTimeMillis() - startTime < timeout) {
                 talkMessage = messageCache.get(messageId);
                 if (talkMessage != null) {
@@ -157,6 +139,5 @@ public class talkerserviceimpl implements talkservice {
             log.warn("Message with ID {} not found within timeout period.", messageId);
             return null;
         });
-
-
-}}
+    }
+}

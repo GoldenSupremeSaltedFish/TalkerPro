@@ -1,8 +1,7 @@
 package org.example.talker.service.Impl;
 
 import jakarta.annotation.Resource;
-import org.apache.catalina.User;
-import org.example.talker.entity.user;
+
 import org.example.talker.mapper.UserMapper;
 import org.example.talker.service.Login;
 import org.example.talker.util.Impl.AESUtil;

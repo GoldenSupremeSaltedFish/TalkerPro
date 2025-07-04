@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: talker-service
+          uri: lb://talker-service
+          predicates:
+            - Path=/talker/**
+          filters:
+            - StripPrefix=1
+        - id: stark-spark-service
+          uri: lb://stark-spark-service
+          predicates:
+            - Path=/spark/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true 

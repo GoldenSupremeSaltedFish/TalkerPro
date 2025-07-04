@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  */
 @ControllerAdvice(basePackages = "org.example.talker.controller")
 public class ExceptionAdvice {
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionAdvice.class);
+    public static final Logger logger = LoggerFactory.getLogger(ExceptionAdvice.class);
 
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
