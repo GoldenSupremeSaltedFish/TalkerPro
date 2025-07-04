@@ -7,10 +7,10 @@ import org.example.payoff.entiy.DeductionRecord;
 
 @Mapper
 public interface DeductionRecordMapper {
-    @Select("SELECT * FROM deduction_record WHERE userid = #{userid}")
-    public String getDeductionRecordByUserId(String userid);
+    @Select("SELECT * FROM deduction_record WHERE user_id = #{userId}")
+    public DeductionRecord getDeductionRecordByUserId(String userId);
 
-    @Insert("INSERT into deduction_record ( userid, deduction_points, deduction_method, created_at) VALUES (#{userid}, #{deduction_points}, #{deduction_method}, #{created_at})")
-    public void InsertPaypoint(DeductionRecord deduction_record);
+    @Insert("INSERT INTO deduction_record (user_id, deduction_points, deduction_method, created_at) " +
+            "VALUES (#{userId}, #{deductionPoints}, #{deductionMethod}, #{createdAt})")
+    public void insertPaypoint(DeductionRecord deductionRecord);
 }
-
