@@ -121,6 +121,13 @@
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
 
+        <!-- Fabric8 Kubernetes Client -->
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>7.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
