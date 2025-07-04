@@ -28,6 +28,20 @@ public class PayController {
         return "Deployment deleted successfully";
     }
 
+    @PostMapping("/payoff")
+    public String createOrUpdatePayOff(@RequestParam String namespace,
+                                   @RequestBody PayOff payOff) {
+        kubernetesOperatorService.createOrUpdatePayOff(namespace, payOff);
+        return "PayOff resource reconciled successfully";
+    }
+
+    @DeleteMapping("/payoff")
+    public String deletePayOff(@RequestParam String namespace,
+                           @RequestParam String name) {
+        kubernetesOperatorService.deletePayOff(namespace, name);
+        return "PayOff resource deleted successfully";
+    }
+
     @PostMapping("/pay")
     public String pay() {
         return paymentService.processPayment();
